@@ -1,3 +1,3 @@
-# VolRecon
+# VolRecon (CVPR 2023)
 
-Coming Soon.
+Code will be available before end of March.
