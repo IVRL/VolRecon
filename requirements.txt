@@ -1,0 +1,25 @@
+torch==1.10.0
+# pip install torch==1.11.0+cu113 torchvision==0.12.0+cu113 torchaudio==0.11.0 --extra-index-url https://download.pytorch.org/whl/cu113
+
+torchvision
+numpy
+SharedArray
+opencv-python
+piq
+einops
+wandb
+pytorch_lightning
+GPUtil
+termcolor
+ipdb
+PyMCubes
+trimesh
+plyfile
+pillow
+scikit-image=0.16.2
+numba
+pycuda
+open3d
+scikit-learn
+
+pyembree
