@@ -17,6 +17,7 @@ from pytorch_lightning.utilities.model_summary import ModelSummary
 from code.model import VolRecon
 from code.dataset.dtu_train import MVSDataset
 from code.dataset.dtu_test_sparse import DtuFitSparse
+from code.dataset.general_fit import GeneralFit
 
 PI = math.pi
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -63,6 +64,8 @@ if __name__ == "__main__":
         help='directory of to save test result')
     parser.add_argument('--extract_geometry', dest='extract_geometry', action='store_true', 
         help='if you only want to extract geometry')
+    parser.add_argument('--test_general', dest='test_general', action='store_true', 
+        help='test on custom dataset')
     
     parser.add_argument('--test_ray_num', dest='test_ray_num', type=int, default=1200)
     parser.add_argument('--test_sample_coarse', dest='test_sample_coarse', type=int, default=64)
@@ -112,20 +115,32 @@ if __name__ == "__main__":
                                         num_workers=num_workers, 
                                         shuffle=False)  
     else:
-        # testing on dtu
         dataloader_test = []
-        # 15 test scenes
-        for scan in [24, 37, 40, 55, 63, 65, 69, 83, 97, 105, 106, 110, 114, 118, 122]:
-            
-            dataset_tmp = DtuFitSparse(root_dir=args.test_dir, 
-                                split="test", 
-                                scan_id='scan%d'%scan, 
-                                n_views=args.test_n_view)
-            dataloader_tmp = DataLoader(dataset_tmp,
-                                            batch_size=1, 
-                                            num_workers=1, 
-                                            shuffle=False)  
-            dataloader_test.append(dataloader_tmp)
+        # dtu, 15 test scenes
+        if not args.test_general:
+            for scan in [24, 37, 40, 55, 63, 65, 69, 83, 97, 105, 106, 110, 114, 118, 122]:
+                
+                dataset_tmp = DtuFitSparse(root_dir=args.test_dir, 
+                                    split="test", 
+                                    scan_id='scan%d'%scan, 
+                                    n_views=args.test_n_view,
+                                    set=args.set)
+                dataloader_tmp = DataLoader(dataset_tmp,
+                                                batch_size=1, 
+                                                num_workers=1, 
+                                                shuffle=False)  
+                dataloader_test.append(dataloader_tmp)
+        else:
+            for scan in ["general"]:
+                
+                dataset_tmp = GeneralFit(root_dir=args.test_dir, 
+                                    scan_id=scan, 
+                                    n_views=args.test_n_view)
+                dataloader_tmp = DataLoader(dataset_tmp,
+                                                batch_size=1, 
+                                                num_workers=1, 
+                                                shuffle=False)  
+                dataloader_test.append(dataloader_tmp)
 
     # -------------------------------- lightning module -------------------------------
     if args.load_ckpt:

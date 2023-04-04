@@ -6,7 +6,7 @@
 
 ![teaser](./imgs/teaser.jpg)
 
->**Abstract:** The success of the Neural Radiance Fields (NeRF) in novel view synthesis has inspired researchers to propose neural implicit scene reconstruction. However, most existing neural implicit reconstruction methods optimize perscene parameters and therefore lack generalizability to new scenes. We introduce VolRecon, a novel generalizable implicit reconstruction method with Signed Ray Distance Function (SRDF). To reconstruct the scene with fine details and little noise, VolRecon combines projection features aggregated from multi-view features, and volume features interpolated from a coarse global feature volume. Using a ray transformer, we compute SRDF values of sampled points on a ray and then render color and depth. On DTU dataset, VolRecon outperforms SparseNeuS by about 30% in sparse view reconstruction and achieves comparable accuracy as MVSNet in full view reconstruction. Furthermore, our approach exhibits good generalization performance on the large-scale ETH3D benchmark. 
+>**Abstract:** The success of the Neural Radiance Fields (NeRF) in novel view synthesis has inspired researchers to propose neural implicit scene reconstruction. However, most existing neural implicit reconstruction methods optimize per-scene parameters and therefore lack generalizability to new scenes. We introduce VolRecon, a novel generalizable implicit reconstruction method with Signed Ray Distance Function (SRDF). To reconstruct the scene with fine details and little noise, VolRecon combines projection features aggregated from multi-view features, and volume features interpolated from a coarse global feature volume. Using a ray transformer, we compute SRDF values of sampled points on a ray and then render color and depth. On DTU dataset, VolRecon outperforms SparseNeuS by about 30% in sparse view reconstruction and achieves comparable accuracy as MVSNet in full view reconstruction. Furthermore, our approach exhibits good generalization performance on the large-scale ETH3D benchmark. 
 
 If you find this project useful for your research, please cite: 
 
@@ -100,9 +100,44 @@ python evaluation/clean_mesh.py --root_dir "PATH_TO_DTU_TEST" --n_view 3 --set 0
 ```
 python evaluation/dtu_eval.py --dataset_dir "PATH_TO_SampleSet_MVS_Data"
 ```
-* Note that you can change `--set` in ``eval_dtu.sh`` and `--set` during mesh cleaning to use different image sets (0 or 1). By default, image set 0 is used. The average performance of sets 0 and 1 
+* Note that you can change `--set` in ``eval_dtu.sh`` and `--set` during mesh cleaning to use different image sets (0 or 1). By default, image set 0 is used. The average chamfer distance of sets 0 and 1 is what we reported in Table 1. 
 
 
+## Evaluation on Custom Dataset
+We provide some helpful scripts for evaluation on custom datasets, which consists of a set of images. As discussed in the limitation section, our method is not suitable for very large-scale scenes because of the coarse global feature volume. The main steps are as follows:
+* Run COLMAP for sparse reconstruction. 
+* Use ``colmap_input.py`` to convert COLMAP's sparse reconstruction results into the similar format as the datasets that we use. The dataset should be organized as:
+```
+root_directory
+├──scene_name1
+├──scene_name2 
+      ├── images                 
+      │   ├── 00000000.jpg       
+      │   ├── 00000001.jpg       
+      │   └── ...                
+      ├── cams                   
+      │   ├── 00000000_cam.txt   
+      │   ├── 00000001_cam.txt   
+      │   └── ...                
+      └── pair.txt  
+```
+This step is mainly to get camera files and view selection (``pair.txt``). As discussed previously, the view selection will pick out best source views for a reference view, which also helps to further reduce the volume size. The camera file stores the camera parameters, which includes extrinsic, intrinsic, minimum depth and maximum depth:
+```
+extrinsic
+E00 E01 E02 E03
+E10 E11 E12 E13
+E20 E21 E22 E23
+E30 E31 E32 E33
+
+intrinsic
+K00 K01 K02
+K10 K11 K12
+K20 K21 K22
+
+DEPTH_MIN DEPTH_MAX
+```
+* The file ``code/dataset/general_fit.py`` is the dataset loader. The parameter ``self.offset_dist`` is the distance offset w.r.t. the reference view to generate a virtual viewpoint for rendering, which can be adjusted (set to 25mm by default). 
+* Use ``script/eval_general.sh`` for image and depth rendering. 
 
 ## Training on DTU
 
