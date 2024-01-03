@@ -260,7 +260,7 @@ class MVSDataset(Dataset):
             near_fars.append(self.all_near_fars[index_mat])
             intrinsics.append(self.all_intrinsics[index_mat])
 
-            w2cs.append(self.all_extrinsics[index_mat] @ w2c_ref_inv)
+            w2cs.append(self.all_extrinsics[index_mat])
 
             if os.path.exists(depth_filename):  # and i == 0
                 depth_h = self.read_depth(depth_filename)
