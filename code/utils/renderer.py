@@ -1,4 +1,5 @@
 import torch
+import torch.nn.functional as F
 
 class VolumeRenderer():
     def __init__(self, args=None):
@@ -26,7 +27,10 @@ class VolumeRenderer():
         inv_s = inv_s0.expand(batch_size, n_samples)
 
         true_cos = -1.0
-        iter_cos = -(-true_cos * 0.5 + 0.5 * (1.0 - cos_anneal_ratio) -true_cos * cos_anneal_ratio)  
+        
+        # FIX: https://github.com/IVRL/VolRecon/issues/15
+        iter_cos = -(F.relu(-true_cos * 0.5 + 0.5) * (1.0 - cos_anneal_ratio) + F.relu(-true_cos) * cos_anneal_ratio)
+        # iter_cos = -(-true_cos * 0.5 + 0.5 * (1.0 - cos_anneal_ratio) -true_cos * cos_anneal_ratio)  
 
         estimated_next_srdf = srdf + iter_cos * interval * 0.5
         estimated_prev_srdf = srdf - iter_cos * interval * 0.5
