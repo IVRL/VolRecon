@@ -4,6 +4,8 @@
 
 ### [Project](https://fangjinhuawang.github.io/VolRecon/) | [arXiv](https://arxiv.org/abs/2212.08067) 
 
+[![DOI](https://zenodo.org/badge/576586808.svg)](https://zenodo.org/doi/10.5281/zenodo.11093887)
+
 ![teaser](./imgs/teaser.jpg)
 
 >**Abstract:** The success of the Neural Radiance Fields (NeRF) in novel view synthesis has inspired researchers to propose neural implicit scene reconstruction. However, most existing neural implicit reconstruction methods optimize per-scene parameters and therefore lack generalizability to new scenes. We introduce VolRecon, a novel generalizable implicit reconstruction method with Signed Ray Distance Function (SRDF). To reconstruct the scene with fine details and little noise, VolRecon combines projection features aggregated from multi-view features, and volume features interpolated from a coarse global feature volume. Using a ray transformer, we compute SRDF values of sampled points on a ray and then render color and depth. On DTU dataset, VolRecon outperforms SparseNeuS by about 30% in sparse view reconstruction and achieves comparable accuracy as MVSNet in full view reconstruction. Furthermore, our approach exhibits good generalization performance on the large-scale ETH3D benchmark. 
